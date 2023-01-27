@@ -23,12 +23,6 @@ import (
 	"github.com/hashicorp/terraform-provider-aws/internal/verify"
 )
 
-const (
-	clusterScalingConfiguration_DefaultMinCapacity = 1
-	clusterScalingConfiguration_DefaultMaxCapacity = 16
-	clusterTimeoutDelete                           = 2 * time.Minute
-)
-
 // @SDKResource("aws_rds_cluster")
 func ResourceCluster() *schema.Resource {
 	return &schema.Resource{
