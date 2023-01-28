@@ -1544,7 +1544,7 @@ func waitDBClusterUpdated(ctx context.Context, conn *rds.RDS, id string, timeout
 	return nil, err
 }
 
-func waitDBClusterDeleted(ctx context.Context, conn *rds.RDS, id string, timeout time.Duration) (*rds.DBCluster, error) {
+func waitDBClusterDeleted(ctx context.Context, conn *rds.RDS, id string, timeout time.Duration) (*rds.DBCluster, error) { //nolint:unparam
 	stateConf := &resource.StateChangeConf{
 		Pending: []string{
 			ClusterStatusAvailable,
