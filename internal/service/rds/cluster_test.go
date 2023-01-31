@@ -101,7 +101,7 @@ func TestAccRDSCluster_disappears(t *testing.T) {
 				Config: testAccClusterConfig_basic(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckClusterExists(ctx, resourceName, &dbCluster),
-					acctest.CheckResourceDisappears(ctx, acctest.Provider, tfrds.ResourceCluster(), resourceName),
+					acctest.CheckFrameworkResourceDisappears(acctest.Provider, tfrds.ResourceClusterFramework, resourceName),
 				),
 				ExpectNonEmptyPlan: true,
 			},
@@ -2188,6 +2188,40 @@ func TestAccRDSCluster_enableHTTPEndpoint(t *testing.T) {
 					testAccCheckClusterExists(ctx, resourceName, &dbCluster),
 					resource.TestCheckResourceAttr(resourceName, "enable_http_endpoint", "false"),
 				),
+			},
+		},
+	})
+}
+
+func TestAccRDSCluster_MigrateFromPluginSDK(t *testing.T) {
+	ctx := acctest.Context(t)
+	resourceName := "aws_rds_cluster.test"
+	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
+
+	var dbCluster rds.DBCluster
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { acctest.PreCheck(t) },
+		ErrorCheck:   acctest.ErrorCheck(t, rds.EndpointsID),
+		CheckDestroy: testAccCheckClusterDestroy(ctx),
+		Steps: []resource.TestStep{
+			{
+				ExternalProviders: map[string]resource.ExternalProvider{
+					"aws": {
+						Source:            "hashicorp/aws",
+						VersionConstraint: "4.51.0",
+					},
+				},
+				Config: testAccClusterConfig_basic(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckClusterExists(ctx, resourceName, &dbCluster),
+					resource.TestCheckResourceAttr(resourceName, "cluster_identifier", rName),
+				),
+			},
+			{
+				ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
+				Config:                   testAccClusterConfig_basic(rName),
+				PlanOnly:                 true,
 			},
 		},
 	})
