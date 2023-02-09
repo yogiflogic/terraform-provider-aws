@@ -58,8 +58,6 @@ func TestAccRDSCluster_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "db_cluster_parameter_group_name_actual", "default.aurora5.6"),
 					resource.TestCheckResourceAttr(resourceName, "enabled_cloudwatch_logs_exports.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "engine", "aurora"),
-					// resource.TestCheckResourceAttrSet(resourceName, "engine_version"),
-					// resource.TestCheckResourceAttr(resourceName, "global_cluster_identifier", ""),
 					resource.TestCheckResourceAttrSet(resourceName, "hosted_zone_id"),
 					resource.TestCheckResourceAttr(resourceName, "network_type", "IPV4"),
 					resource.TestCheckResourceAttrSet(resourceName, "reader_endpoint"),
@@ -861,8 +859,6 @@ func TestAccRDSCluster_encrypted(t *testing.T) {
 					testAccCheckClusterExists(ctx, resourceName, &v),
 					resource.TestCheckResourceAttr(
 						resourceName, "storage_encrypted", "true"),
-					//resource.TestCheckResourceAttr(
-					//	resourceName, "db_cluster_parameter_group_name", "default.aurora5.6"),
 				),
 			},
 		},
@@ -1263,7 +1259,6 @@ func TestAccRDSCluster_GlobalClusterIdentifierEngineModeGlobal_add(t *testing.T)
 				Config: testAccClusterConfig_EngineMode_global(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckClusterExists(ctx, resourceName, &dbCluster1),
-					//resource.TestCheckResourceAttr(resourceName, "global_cluster_identifier", ""),
 				),
 			},
 			{
@@ -1299,7 +1294,6 @@ func TestAccRDSCluster_GlobalClusterIdentifierEngineModeGlobal_remove(t *testing
 				Config: testAccClusterConfig_EngineMode_global(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckClusterExists(ctx, resourceName, &dbCluster1),
-					// resource.TestCheckResourceAttr(resourceName, "global_cluster_identifier", ""),
 				),
 			},
 		},
