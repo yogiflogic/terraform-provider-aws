@@ -1,0 +1,11 @@
+```release-note:bug
+resource/aws_rds_cluster: `snapshot_identifier` change now properly forces replacement
+```
+
+```release-note:bug
+resource/aws_docdb_cluster: `snapshot_identifier` change now properly forces replacement
+```
+
+```release-note:bug
+resource/aws_neptune_cluster: `snapshot_identifier` change now properly forces replacement
+```
