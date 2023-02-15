@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-provider-aws/internal/verify"
 )
 
 type utcTimestampValidator struct{}
@@ -64,7 +65,7 @@ func (validator onceADayWindowFormatValidator) ValidateString(ctx context.Contex
 		return
 	}
 
-	if err := validateOnceADayWindowFormat(request.ConfigValue.ValueString()); err != nil {
+	if err := verify.ValidateOnceADayWindowFormat(request.ConfigValue.ValueString()); err != nil {
 		response.Diagnostics.Append(diag.NewAttributeErrorDiagnostic(
 			request.Path,
 			validator.Description(ctx),
@@ -76,18 +77,6 @@ func (validator onceADayWindowFormatValidator) ValidateString(ctx context.Contex
 
 func OnceADayWindowFormat() validator.String {
 	return onceADayWindowFormatValidator{}
-}
-
-func validateOnceADayWindowFormat(value string) error {
-	// valid time format is "hh24:mi"
-	validTimeFormat := "([0-1][0-9]|2[0-3]):([0-5][0-9])"
-	validTimeFormatConsolidated := "^(" + validTimeFormat + "-" + validTimeFormat + "|)$"
-
-	if !regexp.MustCompile(validTimeFormatConsolidated).MatchString(value) {
-		return fmt.Errorf("(%s) must satisfy the format of \"hh24:mi-hh24:mi\"", value)
-	}
-
-	return nil
 }
 
 type onceAWeekWindowFormatValidator struct{}

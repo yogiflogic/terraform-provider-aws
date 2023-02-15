@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-var accountIDRegexp = regexp.MustCompile(`^(aws|aws-managed|third-party|\d{12})$`)
+var arnAccountIDRegexp = regexp.MustCompile(`^(aws|aws-managed|third-party|\d{12})$`)
 var partitionRegexp = regexp.MustCompile(`^aws(-[a-z]+)*$`)
 var regionRegexp = regexp.MustCompile(`^[a-z]{2}(-[a-z]+)+-\d$`)
 
@@ -82,8 +82,8 @@ func ValidateARN(value string) (errors []error) {
 		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid region value (expecting to match regular expression: %s)", value, regionRegexp))
 	}
 
-	if parsedARN.AccountID != "" && !accountIDRegexp.MatchString(parsedARN.AccountID) {
-		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid account ID value (expecting to match regular expression: %s)", value, accountIDRegexp))
+	if parsedARN.AccountID != "" && !arnAccountIDRegexp.MatchString(parsedARN.AccountID) {
+		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid account ID value (expecting to match regular expression: %s)", value, arnAccountIDRegexp))
 	}
 
 	if parsedARN.Resource == "" {
@@ -263,16 +263,26 @@ func ValidMulticastIPAddress(v interface{}, k string) (ws []string, errors []err
 	return
 }
 
-func ValidOnceADayWindowFormat(v interface{}, k string) (ws []string, errors []error) {
+func ValidateOnceADayWindowFormat(value string) error {
 	// valid time format is "hh24:mi"
 	validTimeFormat := "([0-1][0-9]|2[0-3]):([0-5][0-9])"
 	validTimeFormatConsolidated := "^(" + validTimeFormat + "-" + validTimeFormat + "|)$"
 
-	value := v.(string)
 	if !regexp.MustCompile(validTimeFormatConsolidated).MatchString(value) {
-		errors = append(errors, fmt.Errorf(
-			"%q must satisfy the format of \"hh24:mi-hh24:mi\".", k))
+		return fmt.Errorf("(%s) must satisfy the format of \"hh24:mi-hh24:mi\"", value)
 	}
+
+	return nil
+}
+
+func ValidOnceADayWindowFormat(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if err := ValidateOnceADayWindowFormat(value); err != nil {
+		errors = append(errors, err)
+		return
+	}
+
 	return
 }
 
