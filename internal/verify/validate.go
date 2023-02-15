@@ -90,7 +90,7 @@ func ValidateARN(value string) (errors []error) {
 		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: missing resource value", value))
 	}
 
-	return
+	return errors
 }
 
 // ValidateCIDRBlock validates that the specified CIDR block is valid:
@@ -292,7 +292,7 @@ func ValidateOnceAWeekWindowFormat(value string) error {
 	validTimeFormatConsolidated := "^(" + validTimeFormat + "-" + validTimeFormat + "|)$"
 
 	val := strings.ToLower(value)
-	if !regexp.MustCompile(validTimeFormatConsolidated).MatchString(value) {
+	if !regexp.MustCompile(validTimeFormatConsolidated).MatchString(val) {
 		return fmt.Errorf("(%s) must satisfy the format of \"ddd:hh24:mi-ddd:hh24:mi\"", val)
 	}
 
@@ -365,7 +365,6 @@ func ValidateUTCTimestamp(value string) error {
 	}
 
 	return nil
-
 }
 
 // ValidUTCTimestamp validates a string in UTC Format required by APIs including:
