@@ -38,36 +38,11 @@ func Valid4ByteASN(v interface{}, k string) (ws []string, errors []error) {
 func ValidARN(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(string)
 
-	if value == "" {
-		return ws, errors
+	if errs := ValidateARN(value); errs != nil {
+		errors = errs
 	}
 
-	parsedARN, err := arn.Parse(value)
-
-	if err != nil {
-		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: %s", k, value, err))
-		return ws, errors
-	}
-
-	if parsedARN.Partition == "" {
-		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: missing partition value", k, value))
-	} else if !partitionRegexp.MatchString(parsedARN.Partition) {
-		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: invalid partition value (expecting to match regular expression: %s)", k, value, partitionRegexp))
-	}
-
-	if parsedARN.Region != "" && !regionRegexp.MatchString(parsedARN.Region) {
-		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: invalid region value (expecting to match regular expression: %s)", k, value, regionRegexp))
-	}
-
-	if parsedARN.AccountID != "" && !accountIDRegexp.MatchString(parsedARN.AccountID) {
-		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: invalid account ID value (expecting to match regular expression: %s)", k, value, accountIDRegexp))
-	}
-
-	if parsedARN.Resource == "" {
-		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: missing resource value", k, value))
-	}
-
-	return ws, errors
+	return
 }
 
 func ValidAccountID(v interface{}, k string) (ws []string, errors []error) {
@@ -79,6 +54,40 @@ func ValidAccountID(v interface{}, k string) (ws []string, errors []error) {
 		errors = append(errors, fmt.Errorf(
 			"%q doesn't look like AWS Account ID (exactly 12 digits): %q",
 			k, value))
+	}
+
+	return
+}
+
+// ValidateARN validates that a string is an ARN.
+func ValidateARN(value string) (errors []error) {
+	if value == "" {
+		return
+	}
+
+	parsedARN, err := arn.Parse(value)
+
+	if err != nil {
+		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: %s", value, err))
+		return
+	}
+
+	if parsedARN.Partition == "" {
+		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: missing partition value", value))
+	} else if !partitionRegexp.MatchString(parsedARN.Partition) {
+		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid partition value (expecting to match regular expression: %s)", value, partitionRegexp))
+	}
+
+	if parsedARN.Region != "" && !regionRegexp.MatchString(parsedARN.Region) {
+		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid region value (expecting to match regular expression: %s)", value, regionRegexp))
+	}
+
+	if parsedARN.AccountID != "" && !accountIDRegexp.MatchString(parsedARN.AccountID) {
+		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid account ID value (expecting to match regular expression: %s)", value, accountIDRegexp))
+	}
+
+	if parsedARN.Resource == "" {
+		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: missing resource value", value))
 	}
 
 	return
