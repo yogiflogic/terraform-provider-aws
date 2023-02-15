@@ -347,15 +347,26 @@ func ValidTypeStringNullableFloat(v interface{}, k string) (ws []string, es []er
 	return
 }
 
+func ValidateUTCTimestamp(value string) error {
+	_, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		return fmt.Errorf("must be in RFC3339 time format %q. Example: %s", time.RFC3339, err)
+	}
+
+	return nil
+
+}
+
 // ValidUTCTimestamp validates a string in UTC Format required by APIs including:
 // https://docs.aws.amazon.com/iot/latest/apireference/API_CloudwatchMetricAction.html
 // https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_RestoreDBInstanceToPointInTime.html
 func ValidUTCTimestamp(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(string)
-	_, err := time.Parse(time.RFC3339, value)
-	if err != nil {
-		errors = append(errors, fmt.Errorf("%q must be in RFC3339 time format %q. Example: %s", k, time.RFC3339, err))
+	if err := ValidateUTCTimestamp(value); err != nil {
+		errors = append(errors, err)
+		return
 	}
+
 	return
 }
 

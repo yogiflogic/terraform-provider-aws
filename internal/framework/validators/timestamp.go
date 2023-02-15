@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -27,7 +26,7 @@ func (validator utcTimestampValidator) ValidateString(ctx context.Context, reque
 		return
 	}
 
-	if err := validateUTCTimestamp(request.ConfigValue.ValueString()); err != nil {
+	if err := verify.ValidateUTCTimestamp(request.ConfigValue.ValueString()); err != nil {
 		response.Diagnostics.Append(diag.NewAttributeErrorDiagnostic(
 			request.Path,
 			validator.Description(ctx),
@@ -39,15 +38,6 @@ func (validator utcTimestampValidator) ValidateString(ctx context.Context, reque
 
 func UTCTimestamp() validator.String {
 	return utcTimestampValidator{}
-}
-
-func validateUTCTimestamp(value string) error {
-	_, err := time.Parse(time.RFC3339, value)
-	if err != nil {
-		return fmt.Errorf("must be in RFC3339 time format %q. Example: %s", time.RFC3339, err)
-	}
-
-	return nil
 }
 
 type onceADayWindowFormatValidator struct{}
