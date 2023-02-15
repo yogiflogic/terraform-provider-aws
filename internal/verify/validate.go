@@ -286,16 +286,27 @@ func ValidOnceADayWindowFormat(v interface{}, k string) (ws []string, errors []e
 	return
 }
 
-func ValidOnceAWeekWindowFormat(v interface{}, k string) (ws []string, errors []error) {
+func ValidateOnceAWeekWindowFormat(value string) error {
 	// valid time format is "ddd:hh24:mi"
 	validTimeFormat := "(sun|mon|tue|wed|thu|fri|sat):([0-1][0-9]|2[0-3]):([0-5][0-9])"
 	validTimeFormatConsolidated := "^(" + validTimeFormat + "-" + validTimeFormat + "|)$"
 
-	value := strings.ToLower(v.(string))
+	val := strings.ToLower(value)
 	if !regexp.MustCompile(validTimeFormatConsolidated).MatchString(value) {
-		errors = append(errors, fmt.Errorf(
-			"%q must satisfy the format of \"ddd:hh24:mi-ddd:hh24:mi\".", k))
+		return fmt.Errorf("(%s) must satisfy the format of \"ddd:hh24:mi-ddd:hh24:mi\"", val)
 	}
+
+	return nil
+}
+
+func ValidOnceAWeekWindowFormat(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+
+	if err := ValidateOnceAWeekWindowFormat(value); err != nil {
+		errors = append(errors, err)
+		return
+	}
+
 	return
 }
 

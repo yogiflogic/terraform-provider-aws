@@ -2,9 +2,6 @@ package validators
 
 import (
 	"context"
-	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -84,7 +81,7 @@ func (validator onceAWeekWindowFormatValidator) ValidateString(ctx context.Conte
 		return
 	}
 
-	if err := validateOnceAWeekWindowFormat(request.ConfigValue.ValueString()); err != nil {
+	if err := verify.ValidateOnceAWeekWindowFormat(request.ConfigValue.ValueString()); err != nil {
 		response.Diagnostics.Append(diag.NewAttributeErrorDiagnostic(
 			request.Path,
 			validator.Description(ctx),
@@ -96,16 +93,4 @@ func (validator onceAWeekWindowFormatValidator) ValidateString(ctx context.Conte
 
 func OnceAWeekWindowFormat() validator.String {
 	return onceAWeekWindowFormatValidator{}
-}
-
-func validateOnceAWeekWindowFormat(value string) error {
-	// valid time format is "ddd:hh24:mi"
-	validTimeFormat := "(sun|mon|tue|wed|thu|fri|sat):([0-1][0-9]|2[0-3]):([0-5][0-9])"
-	validTimeFormatConsolidated := "^(" + validTimeFormat + "-" + validTimeFormat + "|)$"
-
-	val := strings.ToLower(value)
-	if !regexp.MustCompile(validTimeFormatConsolidated).MatchString(val) {
-		return fmt.Errorf("(%s) must satisfy the format of \"ddd:hh24:mi-ddd:hh24:mi\"", value)
-	}
-	return nil
 }
