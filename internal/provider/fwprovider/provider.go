@@ -520,3 +520,15 @@ func (w *wrappedResource) ValidateConfig(ctx context.Context, request resource.V
 		v.ValidateConfig(ctx, request, response)
 	}
 }
+
+func (w *wrappedResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
+	if v, ok := w.inner.(resource.ResourceWithUpgradeState); ok {
+		if w.meta != nil {
+			ctx = w.meta.InitContext(ctx)
+		}
+
+		return v.UpgradeState(ctx)
+	}
+
+	return nil
+}
