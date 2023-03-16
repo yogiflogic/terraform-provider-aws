@@ -18,6 +18,9 @@ func (p *servicePackage) FrameworkDataSources(ctx context.Context) []*types.Serv
 func (p *servicePackage) FrameworkResources(ctx context.Context) []*types.ServicePackageFrameworkResource {
 	return []*types.ServicePackageFrameworkResource{
 		{
+			Factory: newResourceCluster,
+		},
+		{
 			Factory: newResourceExportTask,
 		},
 	}
@@ -141,10 +144,6 @@ func (p *servicePackage) SDKResources(ctx context.Context) []*types.ServicePacka
 		{
 			Factory:  ResourceSubnetGroup,
 			TypeName: "aws_db_subnet_group",
-		},
-		{
-			Factory:  ResourceCluster,
-			TypeName: "aws_rds_cluster",
 		},
 		{
 			Factory:  ResourceClusterActivityStream,
