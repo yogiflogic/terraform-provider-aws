@@ -38,7 +38,7 @@ func Valid4ByteASN(v interface{}, k string) (ws []string, errors []error) {
 func ValidARN(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(string)
 
-	if errs := ValidateARN(value); errs != nil {
+	if errs := ValidateARN(k, value); errs != nil {
 		errors = errs
 	}
 
@@ -60,7 +60,7 @@ func ValidAccountID(v interface{}, k string) (ws []string, errors []error) {
 }
 
 // ValidateARN validates that a string is an ARN.
-func ValidateARN(value string) (errors []error) {
+func ValidateARN(attribute, value string) (errors []error) {
 	if value == "" {
 		return
 	}
@@ -73,21 +73,21 @@ func ValidateARN(value string) (errors []error) {
 	}
 
 	if parsedARN.Partition == "" {
-		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: missing partition value", value))
+		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: missing partition value", attribute, value))
 	} else if !partitionRegexp.MatchString(parsedARN.Partition) {
-		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid partition value (expecting to match regular expression: %s)", value, partitionRegexp))
+		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: invalid partition value (expecting to match regular expression: %s)", attribute, value, partitionRegexp))
 	}
 
 	if parsedARN.Region != "" && !regionRegexp.MatchString(parsedARN.Region) {
-		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid region value (expecting to match regular expression: %s)", value, regionRegexp))
+		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: invalid region value (expecting to match regular expression: %s)", attribute, value, regionRegexp))
 	}
 
 	if parsedARN.AccountID != "" && !arnAccountIDRegexp.MatchString(parsedARN.AccountID) {
-		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: invalid account ID value (expecting to match regular expression: %s)", value, arnAccountIDRegexp))
+		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: invalid account ID value (expecting to match regular expression: %s)", attribute, value, arnAccountIDRegexp))
 	}
 
 	if parsedARN.Resource == "" {
-		errors = append(errors, fmt.Errorf("(%s) is an invalid ARN: missing resource value", value))
+		errors = append(errors, fmt.Errorf("%q (%s) is an invalid ARN: missing resource value", attribute, value))
 	}
 
 	return errors
